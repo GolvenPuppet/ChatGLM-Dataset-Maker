@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>znMemories微调数据集生成器</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mtu/dist/mtu.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mtu/dist/mtu.min.js"></script>
+</head>
+
+<body id="newton" class='mdui-theme-primary-light-blue mdui-theme-accent-pink mdui-loaded mdui-theme-layout-dark'>
+    <div class="mdui-dialog" id="dialog">
+        <div id="handle" class="mdui-dialog-title">修改对话</div>
+        <div class="mdui-dialog-content">
+            <div class="mdui-row">
+                <div class="mdui-divider mdui-col-xs-12"></div>
+                <div class="mdui-col-xs-12">
+                    <br></br>
+                    <div class="mdui-container">
+                        <div class="mdui-row">
+                            <div class="mdui-col-xs-12">
+                                <div class="mdui-textfield">
+                                    <label class="mdui-textfield-label">Index</label>
+                                    <input id="talkIndex" class="mdui-textfield-input" type="text" disabled />
+                                </div>
+                                <div class="mdui-textfield">
+                                    <label class="mdui-textfield-label">Prompt</label>
+                                    <input id="talkPrompt" class="mdui-textfield-input" type="text" />
+                                </div>
+                                <div class="mdui-textfield">
+                                    <label class="mdui-textfield-label">Response</label>
+                                    <div class="mdui-textfield">
+                                        <textarea id="talkResponse" class="mdui-textfield-input" placeholder="Response"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mdui-divider mdui-col-xs-12"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mdui-dialog-actions">
+            <button class="mdui-btn mdui-ripple" mdui-dialog-cancel>取消</button>
+            <button id="saveTalk" class="mdui-btn mdui-ripple">保存</button>
+        </div>
+    </div>
+    <div class="newton">
+        <header class="mdui-appbar mdui-appbar-fixed mdui-hoverable mdui-ripple mdui-appbar-scroll-hide">
+            <!-- 顶部 -->
+            <div id="place" style="height:18px;"></div>
+            <div class="mdui-appbar" stytle="overflow:hidden">
+                <!-- 顶部菜单 -->
+                <div class="mdui-toolbar mdui-color-theme" stytle="overflow:hidden">
+                    <span id="headtitle" class="mdui-typo-title mdui-col-xs-12">znMemories微调数据集生成器</span>
+                </div>
+            </div>
+        </header>
+        <div class="mdui-container">
+            <div class="mdui-row">
+                <div class="mdui-row" align="center" style="height:98px;">
+                    <div class="mdui-center mdui-col-xs-12">
+                    </div>
+                </div>
+                <div class="mdui-row mdui-shadow-8">
+                    <div class="mdui-row" align="center" style="height:28px;">
+                        <div class="mdui-center mdui-col-xs-12"></div>
+                    </div>
+                    <div class="mdui-center mdui-col-xs-12">
+                        <div id="talks" class="mdui-typo">
+                            
+                        </div>
+                        <div class="mdui-row" align="center" style="height:18px;">
+                            <div class="mdui-center mdui-col-xs-12"></div>
+                        </div>
+                        <blockquote>
+                            <button id="addTalk" class="mdui-btn mdui-btn-icon" onclick = "addTalk()">
+                                <i class="mdui-icon material-icons">add</i>
+                            </button>
+                        </blockquote>
+                        <div class="mdui-row" align="center" style="height:8px;">
+                            <div class="mdui-center mdui-col-xs-12"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mdui-row" align="center" style="height:28px;">
+                    <div class="mdui-center mdui-col-xs-12"></div>
+                </div>
+                <div class="mdui-row mdui-shadow-8">
+                    <div class="mdui-row" align="center" style="height:8px;">
+                        <div class="mdui-center mdui-col-xs-12"></div>
+                    </div>
+                    <div class="mdui-typo">
+                        <blockquote>
+                            <h4><strong>共计 <mark id="answersLen">0</mark>条对话, </strong><strong>当前第 <mark id="nowAnswer">1</mark>条.</strong></h4>
+                            <div class="mdui-textfield">
+                                <label class="mdui-textfield-label">读取对话索引</label>
+                                <input id="nowAnswerIndex" class="mdui-textfield-input" oninput="this.value = this.value.replace(/[^0-9]/g, '');" type="text" />
+                            </div>
+                        </blockquote>
+                    </div>
+                    <div class="mdui-row" align="center" style="height:18px;">
+                        <div class="mdui-center mdui-col-xs-12"></div>
+                    </div>
+                    <div class="mdui-container">
+                        <div class="mdui-row-xs-7">
+                            <div class="mdui-col">
+                                <button id="createAnswer" class="mdui-btn mdui-btn-block mdui-ripple">新建</button>
+                            </div>
+                            <div class="mdui-col">
+                                <button id="preAnswer" class="mdui-btn mdui-btn-block mdui-ripple">上一条</button>
+                            </div>
+                            <div class="mdui-col">
+                                <button id="saveAnswer" class="mdui-btn mdui-btn-block mdui-ripple">保存</button>
+                            </div>
+                            <div class="mdui-col">
+                                <button id="readAnswer" class="mdui-btn mdui-btn-block mdui-ripple">读取</button>
+                            </div>
+                            <div class="mdui-col">
+                                <button id="nextAnswer" class="mdui-btn mdui-btn-block mdui-ripple">下一条</button>
+                            </div>
+                            <div class="mdui-col">
+                                <button id="delAnswer" class="mdui-btn mdui-btn-block mdui-ripple">删除</button>
+                            </div>
+                            <div class="mdui-col">
+                                <button id="outAnswer" class="mdui-btn mdui-btn-block mdui-ripple">导出json</button>
+                            </div>
+                        </div>
+                        <div class="mdui-row" align="center" style="height:28px;">
+                            <div class="mdui-center mdui-col-xs-12"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/js/mdui.min.js"
+            integrity="sha384-gCMZcshYKOGRX9r6wbDrvF+TcCCswSHFucUzUPwka+Gr+uHgjlYvkABr95TCOz3A"
+            crossorigin="anonymous"></script>
+    <script language="javascript">
+        var $ = mdui.$;
+
+        //Global variable
+        var tempAnswer = [];
+        var nowAnswerIndex = 0;
+        var answersLen = 0;
+
+
+        //API function
+        function getAnswersLen(callback) {
+            $.ajax({
+                method: 'POST',
+                url: 'http://localhost:8000/getAnswersLen',
+                data: {
+                },
+                success: function (data) {
+
+                    callback(JSON.parse(data).Len)
+                }
+            });
+        }
+        function getAnswer(index, callback) {
+            $.ajax({
+                method: 'POST',
+                url: 'http://localhost:8000/getAnswer',
+                data: JSON.stringify({
+                    index: index - 1
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.code != 200) {
+
+                        getAnswersLen(function (len) {
+                            document.getElementById("answersLen").innerText = len;
+                            document.getElementById("nowAnswer").innerText = len + 1;
+                            document.getElementById("nowAnswerIndex").value = len;
+                        })
+                        return;
+                    }
+                    callback(data.answer)
+                }
+            });
+        }
+        function delAnswer(index, callback) {
+            $.ajax({
+                method: 'POST',
+                url: 'http://localhost:8000/delAnswer',
+                data: JSON.stringify({
+                    index: index - 1
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    mdui.snackbar({
+                        message: "删除成功",
+                        position: 'left-top',
+                    });
+                    callback(data.answer)
+                }
+            });
+        }
+        function addAnswer(answer, callback) {
+            $.ajax({
+                method: 'POST',
+                url: 'http://localhost:8000/addAnswer',
+                data: JSON.stringify({
+                    answer: answer
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    mdui.snackbar({
+                        message: "添加成功",
+                        position: 'left-top',
+                    });
+                    callback(data.Len)
+                }
+            });
+        }
+        function saveAnswer(index,answer, callback) {
+            $.ajax({
+                method: 'POST',
+                url: 'http://localhost:8000/saveAnswer',
+                data: JSON.stringify({
+                    index: index-1,
+                    answer: answer
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    mdui.snackbar({
+                        message: "保存成功",
+                        position: 'left-top',
+                    });
+                    callback(data.Len)
+                }
+            });
+        }
+        function outAnswer(callback) {
+            $.ajax({
+                method: 'POST',
+                url: 'http://localhost:8000/outAnswer',
+                data: JSON.stringify({
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    mdui.snackbar({
+                        message: "导出成功",
+                        position: 'left-top',
+                    });
+                    callback()
+                }
+            });
+        }
+        //Page function
+        function showTalks(answer) {
+            var cacheCard = '';
+            var stdCard =
+                '<blockquote>' +
+                '    <h4><strong>Prompt: </strong></h4>' +
+                '    <p>{prompt}</p>' +
+                '    <h4><strong>Response: </strong></h4>' +
+                '    <p>{response}</p>' +
+                '    <button class="mdui-btn mdui-btn-icon" onclick = "deleteTalk({talkIndex})">' +
+                '        <i class="mdui-icon material-icons">delete</i>' +
+                '    </button>' +
+                '    <button class="mdui-btn mdui-btn-icon" onclick = "reviseTalk({talkIndex})">' +
+                '        <i class="mdui-icon material-icons">create</i>' +
+                '    </button>' +
+                '</blockquote>';
+            for (var i = 0; i < answer.length; i++) {
+                cacheCard += stdCard.replace('{prompt}', answer[i][0]).replace('{response}', answer[i][1]).replace('{talkIndex}', i).replace('{talkIndex}', i)
+            }
+            document.getElementById('talks').innerHTML = cacheCard;
+            mdui.mutation();
+        }
+
+        function deleteTalk(value) {
+            console.log(tempAnswer)
+            mdui.confirm('此操作不可撤销', '确认删除?', function () {
+                console.log(tempAnswer)
+                tempAnswer.splice(value, 1)
+                //console.log(tempAnswer)
+                showTalks(tempAnswer)
+            });
+
+            
+        }
+        function reviseTalk(value) {
+            var inst = new mdui.Dialog('#dialog');
+            inst.open();
+
+            document.getElementById('talkIndex').value = value;
+            document.getElementById('talkPrompt').value = tempAnswer[value][0];
+            document.getElementById('talkResponse').value = tempAnswer[value][1];
+
+            document.getElementById("saveTalk").onclick = function () {
+                let prompt = document.getElementById('talkPrompt').value;
+                let response = document.getElementById('talkResponse').value;
+                if (!prompt) {
+                    mdui.snackbar({
+                        message: "prompt不能为空",
+                        position: 'left-top',
+                    });
+                    return;
+                }
+                if (!response) {
+                    mdui.snackbar({
+                        message: "response不能为空",
+                        position: 'left-top',
+                    });
+                    return;
+                }
+                tempAnswer[value][0] = prompt;
+                tempAnswer[value][1] = response;
+                showTalks(tempAnswer)
+                inst.close();
+            }
+        }
+        function addTalk() {
+            var inst = new mdui.Dialog('#dialog');
+            inst.open();
+
+            document.getElementById('talkIndex').value = "new";
+            document.getElementById('talkPrompt').value = "";
+            document.getElementById('talkResponse').value = "";
+
+            document.getElementById("saveTalk").onclick = function () {
+                let prompt = document.getElementById('talkPrompt').value;
+                let response = document.getElementById('talkResponse').value;
+                if (!prompt) {
+                    mdui.snackbar({
+                        message: "prompt不能为空",
+                        position: 'left-top',
+                    });
+                    return;
+                }
+                if (!response) {
+                    mdui.snackbar({
+                        message: "response不能为空",
+                        position: 'left-top',
+                    });
+                    return;
+                }
+                tempAnswer.push([prompt, response]);
+                showTalks(tempAnswer)
+                inst.close();
+            }
+        }
+        function newAnswer() {
+            document.getElementById("nowAnswer").innerText = "New";
+            tempAnswer = [];
+            nowAnswerIndex = 0
+            showTalks(tempAnswer);
+        }
+        function initPage(isFirst) {
+            if (isFirst) {
+                getAnswersLen(function (len) {
+                    answersLen = len;
+                    nowAnswerIndex = len;
+                    document.getElementById("answersLen").innerText = len;
+                    document.getElementById("nowAnswer").innerText = len;
+                    document.getElementById("nowAnswerIndex").value = len;
+                    if (answersLen != 0) {
+                        getAnswer(nowAnswerIndex, function (answer) {
+                            tempAnswer = answer;
+                            showTalks(tempAnswer);
+                        })
+                    } else {
+                        newAnswer();
+                    }
+                })
+            } else {
+                getAnswersLen(function (len) {
+                    answersLen = len;
+                    //nowAnswerIndex = len;
+                    document.getElementById("answersLen").innerText = len;
+                    document.getElementById("nowAnswer").innerText = nowAnswerIndex;
+                    //document.getElementById("nowAnswerIndex").value = len;
+                    if (answersLen != 0) {
+                        getAnswer(nowAnswerIndex, function (answer) {
+                            tempAnswer = answer;
+                            showTalks(tempAnswer);
+                        })
+                    } else {
+                        newAnswer();
+                    }
+                })
+            }
+        }
+
+        document.getElementById("readAnswer").onclick = function () {
+            let index = document.getElementById("nowAnswerIndex").value
+            if (index < 1) {
+                mdui.snackbar({
+                    message: "索引不能小于1",
+                    position: 'left-top',
+                });
+                return
+            }
+            if (index > answersLen) {
+                mdui.snackbar({
+                    message: "索引不能大于总数",
+                    position: 'left-top',
+                });
+                return
+            }
+            nowAnswerIndex = index;
+            initPage();
+        }
+        document.getElementById("preAnswer").onclick = function () {
+            if (nowAnswerIndex == 0) {
+                mdui.snackbar({
+                    message: "新建时无法执行此操作",
+                    position: 'left-top',
+                });
+                return;
+            }
+            if (nowAnswerIndex <= 1) {
+                mdui.snackbar({
+                    message: "已经是第一条对话了",
+                    position: 'left-top',
+                });
+                return;
+            } else {
+                nowAnswerIndex -= 1;
+                initPage();
+            }
+        }
+        document.getElementById("nextAnswer").onclick = function () {
+            if (nowAnswerIndex == 0) {
+                mdui.snackbar({
+                    message: "新建时无法执行此操作",
+                    position: 'left-top',
+                });
+                return;
+            }
+            if (nowAnswerIndex >= answersLen) {
+                mdui.snackbar({
+                    message: "已经是最后一条对话了",
+                    position: 'left-top',
+                });
+                return;
+            } else {
+                nowAnswerIndex += 1;
+                initPage();
+            }
+        }
+        document.getElementById("createAnswer").onclick = function () {
+            newAnswer()
+        }
+        document.getElementById("saveAnswer").onclick = function () {
+            if (nowAnswerIndex == 0) {
+                addAnswer(tempAnswer, function () {
+                    initPage(1);
+                });
+            } else {
+                saveAnswer(nowAnswerIndex, tempAnswer, function () {
+                    initPage();
+                })
+            }
+        }
+        document.getElementById("delAnswer").onclick = function () {
+            if (nowAnswerIndex == 0) {
+                tempAnswer = [];
+                nowAnswerIndex = 0
+                showTalks(tempAnswer);
+            } else if (nowAnswerIndex == 1) {
+                delAnswer(nowAnswerIndex, function (){
+                    initPage()
+                    newAnswer()
+                })
+                //do delte
+                
+            } else {
+                //do delte
+            }
+        }
+        document.getElementById("outAnswer").onclick = function () {
+            outAnswer(function () {
+                return
+            });
+        }
+        
+        initPage(1)
+        
+    </script>
+    <br>
+    <footer>
+        <div>
+            <div class="mdui-container-fluid">
+                <div class="mdui-row">
+                    <div class="mdui-col-md-1"></div>
+                    <div class="mdui-col-md-5">
+                        <br>
+                        <br>
+                        <span class="mdui-typo-display-1">znMemories</span>
+                    </div>
+                    <div class="mdui-col-md-1"></div>
+                    <div class="mdui-col-md-5">
+                        <br>
+                        <span class="mdui-typo-headline">微调数据集生成器</span>
+                        <br>
+                        <br>
+                        <span class="mdui-typo-title">Author: znMemories</span>
+                        <br>
+                        <br>
+                        <span class="mdui-typo-title">E-mail: GolvenPuppet@outlook.com</span>
+                        <br>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mdui-container-fluid">
+            <div class="mdui-row">
+            </div>
+        </div>
+        <div class="mdui-container-fluid">
+        </div>
+    </footer>
+</body>
+</html>
