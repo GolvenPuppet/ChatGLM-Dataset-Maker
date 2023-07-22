@@ -35,7 +35,7 @@ def saveAnswers(answers):
 
 def readAnswers():
     if os.path.exists("data.pkl"):
-        with open("datat.pkl", "rb") as file:
+        with open("data.pkl", "rb") as file:
             #从数据库同步回答
             answers = pickle.load(file)
     else:
