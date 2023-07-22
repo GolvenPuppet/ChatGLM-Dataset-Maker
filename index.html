@@ -28,7 +28,9 @@
                                 </div>
                                 <div class="mdui-textfield">
                                     <label class="mdui-textfield-label">Prompt</label>
-                                    <input id="talkPrompt" class="mdui-textfield-input" type="text" />
+                                    <div class="mdui-textfield">
+                                        <textarea id="talkPrompt" class="mdui-textfield-input" placeholder="Prompt"></textarea>
+                                    </div>
                                 </div>
                                 <div class="mdui-textfield">
                                     <label class="mdui-textfield-label">Response</label>
@@ -153,7 +155,7 @@
         function getAnswersLen(callback) {
             $.ajax({
                 method: 'POST',
-                url: 'http://localhost:8000/getAnswersLen',
+                url: '/getAnswersLen',
                 data: {
                 },
                 success: function (data) {
@@ -165,7 +167,7 @@
         function getAnswer(index, callback) {
             $.ajax({
                 method: 'POST',
-                url: 'http://localhost:8000/getAnswer',
+                url: '/getAnswer',
                 data: JSON.stringify({
                     index: index - 1
                 }),
@@ -188,7 +190,7 @@
         function delAnswer(index, callback) {
             $.ajax({
                 method: 'POST',
-                url: 'http://localhost:8000/delAnswer',
+                url: '/delAnswer',
                 data: JSON.stringify({
                     index: index - 1
                 }),
@@ -206,7 +208,7 @@
         function addAnswer(answer, callback) {
             $.ajax({
                 method: 'POST',
-                url: 'http://localhost:8000/addAnswer',
+                url: '/addAnswer',
                 data: JSON.stringify({
                     answer: answer
                 }),
@@ -224,7 +226,7 @@
         function saveAnswer(index,answer, callback) {
             $.ajax({
                 method: 'POST',
-                url: 'http://localhost:8000/saveAnswer',
+                url: '/saveAnswer',
                 data: JSON.stringify({
                     index: index-1,
                     answer: answer
@@ -243,7 +245,7 @@
         function outAnswer(callback) {
             $.ajax({
                 method: 'POST',
-                url: 'http://localhost:8000/outAnswer',
+                url: '/outAnswer',
                 data: JSON.stringify({
                 }),
                 contentType: "application/json; charset=utf-8",
@@ -395,7 +397,8 @@
         }
 
         document.getElementById("readAnswer").onclick = function () {
-            let index = document.getElementById("nowAnswerIndex").value
+            let index = parseInt(document.getElementById("nowAnswerIndex").value)
+
             if (index < 1) {
                 mdui.snackbar({
                     message: "索引不能小于1",
